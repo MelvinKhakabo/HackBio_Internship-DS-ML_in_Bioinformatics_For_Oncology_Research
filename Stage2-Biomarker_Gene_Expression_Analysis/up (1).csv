@@ -1,0 +1,7 @@
+"Enrichment FDR","nGenes","Pathway Genes","Fold Enrichment","Pathway","URL","Genes"
+0.0177924607414818,3,49,16.8780427833784,"Path:hsa05144 Malaria","http://www.genome.jp/kegg-bin/show_pathway?hsa05144 "," CR1  CSF3  CXCL8"
+0.00144081636437946,5,93,14.8212203653323,"Path:hsa04657 IL-17 signaling pathway","http://www.genome.jp/kegg-bin/show_pathway?hsa04657 "," CSF2  CSF3  CXCL8  LCN2  CCL7"
+0.00144081636437946,5,99,13.9229645856152,"Path:hsa04061 Viral protein interaction with cytokine and cytokine receptor","http://www.genome.jp/kegg-bin/show_pathway?hsa04061 "," IL24  CXCL8  PPBP  CCL7  CCL13"
+1.59050692950311e-05,10,294,9.37669043521023,"Path:hsa04060 Cytokine-cytokine receptor interaction","http://www.genome.jp/kegg-bin/show_pathway?hsa04060 "," IL24  CSF2  CSF3  GDF7  CXCL8  INHBC  LEP  PPBP  CCL7  CCL13"
+0.0110451173929777,5,162,8.50847835787595,"Path:hsa04630 JAK-STAT signaling pathway","http://www.genome.jp/kegg-bin/show_pathway?hsa04630 "," IL24  CSF2  CSF3  LEP  PIK3CD"
+0.0177924607414818,5,191,7.2166151517063,"Path:hsa04062 Chemokine signaling pathway","http://www.genome.jp/kegg-bin/show_pathway?hsa04062 "," CXCL8  PIK3CD  PPBP  CCL7  CCL13"
