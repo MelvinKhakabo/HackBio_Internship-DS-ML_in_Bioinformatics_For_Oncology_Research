@@ -1,0 +1,512 @@
+meta <- read.csv("brca_sample_info.csv", row.names = 1)
+# Transpose the data so that genes are columns and samples are rows
+all.trans <- data.frame(t(brca_data))
+# Select the top 1000 most variable genes based on standard deviation
+SDs <- apply(all.trans, 2, sd)
+topPreds <- order(SDs, decreasing = TRUE)[1:1000]
+all.trans <- all.trans[, topPreds]
+#merge the gene expression data with metadata
+all.trans <- merge(all.trans, meta, by = "row.names")
+row.names(all.trans) = as.character(all.trans$Row.names)
+all.trans <- all.trans[, 2:ncol(all.trans)]
+dim(all.trans)
+head(all.trans[, 1:5])
+# PreProcessing steps
+# 1. Remove near-zero variance predictors
+all.zero <- preProcess(all.trans, method = 'nzv', uniqueCut = 15)
+all.trans <- predict(all.zero, all.trans)
+# 2. Center the data
+all.center <- preProcess(all.trans, method = 'center')
+all.trans <- predict(all.center, all.trans)
+# 3. Remove highly correlated features
+#all.corr <- preProcess(all.trans, method = 'corr', cutoff = 0.1)
+#all.trans <- predict(all.corr, all.trans)
+dim(all.trans)
+#TO WORK ON
+# Splitting into training and testing sets (70:30 split)
+intrain <- createDataPartition(y = all.trans$tissue_type, p = 0.7) [[1]]
+length(intrain)
+# Separate training and test sets
+train.brca <- all.trans[intrain, ]
+test.brca <- all.trans[-intrain, ]
+# Check dimensions of training and test sets
+dim(train.brca)
+dim(test.brca)
+#train
+#control group
+ctrl.brca <- trainControl(method = 'cv', number = 5)
+#train
+knn.brca <- train(tissue_type~.,
+data = train.brca,
+method = 'knn',
+trControl = ctrl.brca,
+tuneGrid = data.frame (k=1:20))
+#best k
+knn.brca$bestTune
+#check factor levels:
+levels(train.brca)  # replace with your actual training data column name
+levels(test.brca)    # replace with your actual test data column name
+#align factor levels
+test.brca <- factor(test.brca, levels = levels(train.brca))
+#check factor levels:
+levels(train.brca)  # replace with your actual training data column name
+levels(test.brca)    # replace with your actual test data column name
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#merge the gene expression data with metadata
+all.trans <- merge(all.trans, meta, by = "row.names")
+row.names(all.trans) = as.character(all.trans$Row.names)
+#all.trans <- all.trans[, 2:ncol(all.trans)]
+dim(all.trans)
+head(all.trans[, 1:5])
+row.names(all.trans) = as.character(all.trans$Row.names)
+all.trans <- all.trans[, 2:ncol(all.trans)]
+dim(all.trans)
+head(all.trans[, 1:5])
+# PreProcessing steps
+# 1. Remove near-zero variance predictors
+all.zero <- preProcess(all.trans, method = 'nzv', uniqueCut = 15)
+all.trans <- predict(all.zero, all.trans)
+# 2. Center the data
+all.center <- preProcess(all.trans, method = 'center')
+all.trans <- predict(all.center, all.trans)
+# 3. Remove highly correlated features
+#all.corr <- preProcess(all.trans, method = 'corr', cutoff = 0.1)
+#all.trans <- predict(all.corr, all.trans)
+dim(all.trans)
+#TO WORK ON
+# Splitting into training and testing sets (70:30 split)
+intrain <- createDataPartition(y = all.trans$tissue_type, p = 0.7) [[1]]
+library(caret)
+library(DALEX)
+library(pROC)
+library(ggplot2)
+library(lattice)
+#TO WORK ON
+# Splitting into training and testing sets (70:30 split)
+intrain <- createDataPartition(y = all.trans$tissue_type, p = 0.7) [[1]]
+# Load the BRCA count data
+brca_data <- read.csv("count_data_brca.csv", row.names = 1,)
+meta <- read.csv("brca_sample_info.csv", row.names = 1)
+# Transpose the data so that genes are columns and samples are rows
+all.trans <- data.frame(t(brca_data))
+# Select the top 1000 most variable genes based on standard deviation
+SDs <- apply(all.trans, 2, sd)
+topPreds <- order(SDs, decreasing = TRUE)[1:1000]
+all.trans <- all.trans[, topPreds]
+#merge the gene expression data with metadata
+all.trans <- merge(all.trans, meta, by = "row.names")
+row.names(all.trans) = as.character(all.trans$Row.names)
+all.trans <- all.trans[, 2:ncol(all.trans)]
+dim(all.trans)
+head(all.trans[, 1:5])
+# PreProcessing steps
+# 1. Remove near-zero variance predictors
+all.zero <- preProcess(all.trans, method = 'nzv', uniqueCut = 15)
+all.trans <- predict(all.zero, all.trans)
+# 2. Center the data
+all.center <- preProcess(all.trans, method = 'center')
+all.trans <- predict(all.center, all.trans)
+# 3. Remove highly correlated features
+#all.corr <- preProcess(all.trans, method = 'corr', cutoff = 0.1)
+#all.trans <- predict(all.corr, all.trans)
+dim(all.trans)
+#TO WORK ON
+# Splitting into training and testing sets (70:30 split)
+intrain <- createDataPartition(y = all.trans$tissue_type, p = 0.7) [[1]]
+length(intrain)
+# Separate training and test sets
+train.brca <- all.trans[intrain, ]
+# Separate training and test sets
+train.brca <- all.trans[intrain, ]
+View(train.brca)
+test.brca <- all.trans[-intrain, ]
+View(rf.ctrl)
+View(train.brca)
+# Check dimensions of training and test sets
+dim(train.brca)
+dim(test.brca)
+#train
+#control group
+ctrl.brca <- trainControl(method = 'cv', number = 5)
+#train
+knn.brca <- train(tissue_type~.,
+data = train.brca,
+method = 'knn',
+trControl = ctrl.brca,
+tuneGrid = data.frame (k=1:20))
+#best k
+knn.brca$bestTune
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#best k
+knn.brca$bestTune
+#check factor levels:
+levels(train.brca)  # replace with your actual training data column name
+levels(test.brca)    # replace with your actual test data column name
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+# Make sure the factor levels in test data match those in the training data
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Check which levels in test.brca$ids are not present in train.brca$ids
+unseen_levels <- setdiff(levels(test.brca$ids), levels(train.brca$ids))
+# Option 1: Remove samples with unseen levels in the test data
+test.brca <- test.brca[!test.brca$ids %in% unseen_levels, ]
+# Option 2: Adjust levels so that unseen levels are ignored
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Exclude rows with NA values in predictions (after ensuring levels match)
+testPred <- predict(knn.brca, newdata = test.brca)
+testPred <- na.omit(testPred)
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#interpretation
+#confusion matrix
+#convert to factors
+train.brca$tissue_type <- factor(train.brca$tissue_type)
+test.brca$tissue_type <- factor(test.brca$tissue_type)
+levels(testPred)
+levels(train.brca$tissue_type)
+#check length
+length(testPred)
+length(test.brca$tissue_type)
+#confusion matrix
+library(caret)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+# Check if the feature columns match between training and test sets
+setdiff(colnames(train.brca), colnames(test.brca))
+setdiff(colnames(test.brca), colnames(train.brca))
+# Ensure test set has only the same columns as the training set
+test.brca <- test.brca[, colnames(train.brca)]
+# Check for missing values in the test dataset
+sum(is.na(test.brca))
+#confusion matrix
+library(caret)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+test.brca <- na.omit(test.brca)
+# Option 2: Impute missing values (if applicable)
+test.brca <- preProcess(test.brca, method = 'medianImpute')
+m(is.na(test.brca))
+# Ensure that the test dataset includes the 'tissue_type' column
+head(test.brca$tissue_type)
+# Remove any unwanted columns like 'Row.names'
+test.brca <- test.brca[, -which(colnames(test.brca) == "Row.names")]
+testPred <- predict(knn.brca, newdata = test.brca)
+# Exclude rows with NA values in predictions (after ensuring levels match)
+testPred <- predict(knn.brca, newdata = test.brca)
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+library(caret)
+library(DALEX)
+library(pROC)
+library(ggplot2)
+library(lattice)
+# Set a seed for reproducibility
+set.seed(34567)
+# Load the BRCA count data
+brca_data <- read.csv("count_data_brca.csv", row.names = 1,)
+meta <- read.csv("brca_sample_info.csv", row.names = 1)
+# Transpose the data so that genes are columns and samples are rows
+all.trans <- data.frame(t(brca_data))
+# Select the top 1000 most variable genes based on standard deviation
+SDs <- apply(all.trans, 2, sd)
+topPreds <- order(SDs, decreasing = TRUE)[1:1000]
+all.trans <- all.trans[, topPreds]
+#merge the gene expression data with metadata
+all.trans <- merge(all.trans, meta, by = "row.names")
+row.names(all.trans) = as.character(all.trans$Row.names)
+all.trans <- all.trans[, 2:ncol(all.trans)]
+dim(all.trans)
+head(all.trans[, 1:5])
+# PreProcessing steps
+# 1. Remove near-zero variance predictors
+all.zero <- preProcess(all.trans, method = 'nzv', uniqueCut = 15)
+all.trans <- predict(all.zero, all.trans)
+# 2. Center the data
+all.center <- preProcess(all.trans, method = 'center')
+all.trans <- predict(all.center, all.trans)
+# 3. Remove highly correlated features
+#all.corr <- preProcess(all.trans, method = 'corr', cutoff = 0.1)
+#all.trans <- predict(all.corr, all.trans)
+dim(all.trans)
+#TO WORK ON
+# Splitting into training and testing sets (70:30 split)
+intrain <- createDataPartition(y = all.trans$tissue_type, p = 0.7) [[1]]
+length(intrain)
+# Separate training and test sets
+train.brca <- all.trans[intrain, ]
+test.brca <- all.trans[-intrain, ]
+# Check dimensions of training and test sets
+dim(train.brca)
+dim(test.brca)
+#train
+#control group
+ctrl.brca <- trainControl(method = 'cv', number = 5)
+#train
+knn.brca <- train(tissue_type~.,
+data = train.brca,
+method = 'knn',
+trControl = ctrl.brca,
+tuneGrid = data.frame (k=1:20))
+#best k
+knn.brca$bestTune
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#interpretation
+#confusion matrix
+#convert to factors
+train.brca$tissue_type <- factor(train.brca$tissue_type)
+test.brca$tissue_type <- factor(test.brca$tissue_type)
+#confusion matrix
+library(caret)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+#check factor levels:
+levels(train.brca)  # replace with your actual training data column name
+levels(test.brca)# replace with your actual test data column name
+# Make sure the factor levels in test data match those in the training data
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Check which levels in test.brca$ids are not present in train.brca$ids
+unseen_levels <- setdiff(levels(test.brca$ids), levels(train.brca$ids))
+# Option 1: Remove samples with unseen levels in the test data
+test.brca <- test.brca[!test.brca$ids %in% unseen_levels, ]
+# Option 2: Adjust levels so that unseen levels are ignored
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Exclude rows with NA values in predictions (after ensuring levels match)
+testPred <- predict(knn.brca, newdata = test.brca)
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#interpretation
+#confusion matrix
+#convert to factors
+train.brca$tissue_type <- factor(train.brca$tissue_type)
+test.brca$tissue_type <- factor(test.brca$tissue_type)
+levels(testPred)
+levels(train.brca$tissue_type)
+#check length
+length(testPred)
+length(test.brca$tissue_type)
+# Check if the feature columns match between training and test sets
+setdiff(colnames(train.brca), colnames(test.brca))
+setdiff(colnames(test.brca), colnames(train.brca))
+# Ensure test set has only the same columns as the training set
+test.brca <- test.brca[, colnames(train.brca)]
+#confusion matrix
+library(caret)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+#train
+knn.brca <- train(tissue_type~.,
+data = train.brca,
+method = 'knn',
+trControl = ctrl.brca,
+tuneGrid = data.frame (k=1:20))
+#best k
+knn.brca$bestTune
+#check factor levels:
+levels(train.brca)  # replace with your actual training data column name
+levels(test.brca)# replace with your actual test data column name
+# Make sure the factor levels in test data match those in the training data
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Check which levels in test.brca$ids are not present in train.brca$ids
+unseen_levels <- setdiff(levels(test.brca$ids), levels(train.brca$ids))
+# Option 1: Remove samples with unseen levels in the test data
+test.brca <- test.brca[!test.brca$ids %in% unseen_levels, ]
+# Option 2: Adjust levels so that unseen levels are ignored
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Exclude rows with NA values in predictions (after ensuring levels match)
+testPred <- predict(knn.brca, newdata = test.brca)
+testPred <- na.omit(testPred)
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#interpretation
+#confusion matrix
+#convert to factors
+train.brca$tissue_type <- factor(train.brca$tissue_type)
+test.brca$tissue_type <- factor(test.brca$tissue_type)
+levels(testPred)
+levels(train.brca$tissue_type)
+#check length
+length(testPred)
+testPred <- predict(knn.brca, newdata = test.brca)
+# Ensure test set has only the same columns as the training set
+test.brca <- test.brca[, colnames(train.brca)]
+#confusion matrix
+library(caret)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+#check length
+length(testPred)
+length(test.brca$tissue_type)
+# Check for NA values in the predictions
+sum(is.na(testPred))  # Count the number of NA predictions
+# Convert to factor if necessary
+test.brca$tissue_type <- factor(test.brca$tissue_type, levels = levels(train.brca$tissue_type))
+# Convert to factor if necessary
+test.brca$tissue_type <- factor(test.brca$tissue_type, levels = levels(train.brca$tissue_type))
+# Ensure test set has only the same columns as the training set
+test.brca <- test.brca[, colnames(train.brca)]
+#confusion matrix
+library(caret)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+nrow(test.brca)
+head(testPred)
+head(test.brca$tissue_type)
+testPred <- predict(knn.brca, newdata = test.brca)
+View(test.brca)
+View(train.brca)
+View(train.brca)
+View(all.corr)
+View(all.trans)
+testPred <- factor(testPred, levels = levels(train.brca$tissue_type))
+test.brca$tissue_type <- factor(test.brca$tissue_type, levels = levels(train.brca$tissue_type))
+print(cm_test)
+cm_test <- confusionMatrix(testPred, test.brca$tissue_type)
+print(cm_test)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+#determine variable importance
+label = 'knn',
+confusionMatrix(testPred, test.brca$tissue_type)
+#determine variable importance
+label = "knn",
+confusionMatrix(testPred, test.brca$tissue_type)
+#determine variable importance
+label = 'knn',
+library(caret)
+library(DALEX)
+library(pROC)
+library(ggplot2)
+library(lattice)
+library(ranger)
+# Load the BRCA count data
+brca_data <- read.csv("count_data_brca.csv", row.names = 1)
+meta <- read.csv("brca_sample_info.csv", row.names = 1)
+View(brca_data)
+View(brca_data)
+View(meta)
+View(meta)
+# Ensure that the sample IDs match between count data and metadata
+brca_data <- brca_data[, rownames(meta)]
+View(brca_data)
+View(brca_data)
+View(brca_data)
+View(brca_data)
+#samples under each subset
+table(meta$tissue_type)
+(t(brca_data))
+View(all.trans)
+# Select the top 1000 most variable genes based on standard deviation
+SDs <- apply(all.trans, 2, sd)
+topPreds <- order(SDs, decreasing = TRUE)[1:1000]
+all.trans <- all.trans[, topPreds]
+View(all.trans)
+#merge the gene expression data with metadata
+all.trans <- merge(all.trans, meta, by = "row.names")
+dim(all.trans)
+View(all.trans)
+View(meta)
+View(meta)
+View(all.trans)
+head(all.trans[, 1:5])
+View(all.trans)
+# PreProcessing steps
+# 1. Remove near-zero variance predictors
+all.zero <- preProcess(all.trans, method = 'nzv', uniqueCut = 15)
+View(all.zero)
+View(all.trans)
+View(all.zero)
+# 2. Center the data
+all.center <- preProcess(all.trans, method = 'center')
+# 3. Remove highly correlated features
+all.corr <- preProcess(all.trans, method = 'corr', cutoff = 0.5)
+View(all.trans)
+View(meta)
+# Split the data into training and testing sets
+intrain <- createDataPartition(y = all.trans$tissue_type, p = 0.8) [[1]]
+intrain
+# Create the training and testing datasets
+train.brca <- all.trans[intrain, ]
+View(train.brca)
+test.brca <- all.trans[-intrain, ]
+View(test.brca)
+#check length
+dim(train.brca)
+dim(test.brca)
+trai.brca$tissue_type
+train.brca$tissue_type
+test.brca$tissue_type
+#check length
+dim(train.brca)
+dim(test.brca)
+# Random forest model training
+rf.ctrl <- trainControl(method = 'cv', number = 10)  # Use 10-fold cross-validation(avoid bias)
+rf.brca <- train(tissue_type ~ .,               # Model formula using your target variable
+data = train.brca,                # Training data
+method = 'ranger',                # Random forest method from the ranger package
+trControl = rf.ctrl,              # Corrected 'trControl' argument
+importance = 'permutation',       # Permutation-based importance
+tuneGrid = data.frame(mtry = 100,
+min.node.size = 1,
+splitrule = 'gini'))
+# Error rate
+rf.brca$finalModel$prediction.error
+plot(varImp(rf.brca), top = 10)
+#train
+#control group
+ctrl.brca <- trainControl(method = 'cv', number = 5)
+View(ctrl.brca)
+#train
+knn.brca <- train(tissue_type~.,
+data = train.brca,
+method = 'knn',
+trControl = ctrl.brca,
+tuneGrid = data.frame (k=1:20))
+View(knn.brca)
+knn.brca
+#best k
+knn.brca$bestTune
+View(knn.brca)
+View(all.trans)
+#predict
+trainPred <- predict(knn.brca, newdata = train.brca)
+testPred <- predict(knn.brca, newdata = test.brca)
+#check factor levels:
+levels(train.brca)  # replace with your actual training data column name
+levels(test.brca)# replace with your actual test data column name
+# Make sure the factor levels in test data match those in the training data
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Check which levels in test.brca$ids are not present in train.brca$ids
+unseen_levels <- setdiff(levels(test.brca$ids), levels(train.brca$ids))
+# Option 1: Remove samples with unseen levels in the test data
+test.brca <- test.brca[!test.brca$ids %in% unseen_levels, ]
+# Option 2: Adjust levels so that unseen levels are ignored
+test.brca$ids <- factor(test.brca$ids, levels = levels(train.brca$ids))
+# Exclude rows with NA values in predictions (after ensuring levels match)
+testPred <- predict(knn.brca, newdata = test.brca)
+testPred <- na.omit(testPred)
+testPred <- predict(knn.brca, newdata = test.brca)
+#interpretation
+#confusion matrix
+#convert to factors
+train.brca$tissue_type <- factor(train.brca$tissue_type)
+test.brca$tissue_type <- factor(test.brca$tissue_type)
+levels(testPred)
+levels(train.brca$tissue_type)
+confusionMatrix(trainPred, train.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+confusionMatrix(testPred, test.brca$tissue_type)
+source("C:/Users/User.MADSCIENTIST/Downloads/Stage 3_ML/RandomForest.R")
